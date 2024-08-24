@@ -1,48 +1,49 @@
-import { openai } from "@/lib/openai"
-import { NextRequest, NextResponse } from "next/server"
-import { ZodTypeAny, z } from "zod"
-import { EXAMPLE_ANSWER, EXAMPLE_PROMPT } from "./example"
+import { openai } from "@/lib/openai";
+import { NextRequest, NextResponse } from "next/server";
+import { ZodTypeAny, z } from "zod";
+import { EXAMPLE_ANSWER, EXAMPLE_PROMPT } from "./example";
+import { isRateLimited } from "@/lib/ratelimit"; // Import the rate limiting function
 
 const determineSchemaType = (schema: any): string => {
   if (!schema.hasOwnProperty("type")) {
     if (Array.isArray(schema)) {
-      return "array"
+      return "array";
     } else {
-      return typeof schema
+      return typeof schema;
     }
   }
-  return schema.type
-}
+  return schema.type;
+};
 
 const jsonSchemaToZod = (schema: any): ZodTypeAny => {
-  const type = determineSchemaType(schema)
+  const type = determineSchemaType(schema);
 
   switch (type) {
     case "string":
-      return z.string().nullable()
+      return z.string().nullable();
     case "number":
-      return z.number().nullable()
+      return z.number().nullable();
     case "boolean":
-      return z.boolean().nullable()
+      return z.boolean().nullable();
     case "array":
-      return z.array(jsonSchemaToZod(schema.items)).nullable()
+      return z.array(jsonSchemaToZod(schema.items)).nullable();
     case "object":
-      const shape: Record<string, ZodTypeAny> = {}
+      const shape: Record<string, ZodTypeAny> = {};
       for (const key in schema) {
         if (key !== "type") {
-          shape[key] = jsonSchemaToZod(schema[key])
+          shape[key] = jsonSchemaToZod(schema[key]);
         }
       }
-      return z.object(shape)
+      return z.object(shape);
     default:
-      throw new Error(`Unsupported schema type: ${type}`)
+      throw new Error(`Unsupported schema type: ${type}`);
   }
-}
+};
 
 type PromiseExecutor<T> = (
   resolve: (value: T) => void,
   reject: (reason?: any) => void
-) => void
+) => void;
 
 class RetryablePromise<T> extends Promise<T> {
   static async retry<T>(
@@ -50,31 +51,36 @@ class RetryablePromise<T> extends Promise<T> {
     executor: PromiseExecutor<T>
   ): Promise<T> {
     return new RetryablePromise<T>(executor).catch((error) => {
-      console.error(`Retrying due to error: ${error}`)
+      console.error(`Retrying due to error: ${error}`);
       return retries > 0
         ? RetryablePromise.retry(retries - 1, executor)
-        : RetryablePromise.reject(error)
-    })
+        : RetryablePromise.reject(error);
+    });
   }
 }
 
 export const POST = async (req: NextRequest) => {
-  const body = await req.json()
-  console.log(body)
+  const ip = req.headers.get('x-forwarded-for') || 'unknown-ip'; // Get IP address from headers
+  if (isRateLimited(ip)) {
+    return NextResponse.json({ error: 'Too many requests, please try again later.' }, { status: 429 });
+  }
+
+  const body = await req.json();
+  console.log(body);
   const genericSchema = z.object({
     data: z.string(),
     format: z.object({}).passthrough(),
-  })
+  });
 
-  const { data, format } = genericSchema.parse(body)
+  const { data, format } = genericSchema.parse(body);
 
-  const dynamicSchema = jsonSchemaToZod(format)
+  const dynamicSchema = jsonSchemaToZod(format);
 
   const content = `DATA: \n"${data}"\n\n-----------\nExpected JSON format: ${JSON.stringify(
     format,
     null,
     2
-  )}\n\n-----------\nValid JSON output in expected format:`
+  )}\n\n-----------\nValid JSON output in expected format:`;
 
   const validationResult = await RetryablePromise.retry<string>(
     3,
@@ -101,18 +107,18 @@ export const POST = async (req: NextRequest) => {
               content,
             },
           ],
-        })
+        });
 
-        const text = res.choices[0].message.content
+        const text = res.choices[0].message.content;
 
-        const validationResult = dynamicSchema.parse(JSON.parse(text || ""))
+        const validationResult = dynamicSchema.parse(JSON.parse(text || ""));
 
-        return resolve(validationResult)
+        return resolve(validationResult);
       } catch (err) {
-        reject(err)
+        reject(err);
       }
     }
-  )
+  );
 
-  return NextResponse.json(validationResult, { status: 200 })
-}
+  return NextResponse.json(validationResult, { status: 200 });
+};

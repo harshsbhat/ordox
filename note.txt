@@ -1,0 +1,8 @@
+curl -X POST http://localhost:3000/api/json \
+  -H "Content-Type: application/json" \
+  -d '{
+    ""
+    "format": {
+      "title": {"type": "string"}
+    }
+  }'
