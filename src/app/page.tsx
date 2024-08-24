@@ -7,7 +7,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 
 export default function Home() {
   const curlCommand = `
-curl -X POST http://ordox.vercel.app/api/json \\
+curl -X POST https://ordox.vercel.app/api/json \\
   -H "Content-Type: application/json" \\
   -d '{
     "data": "My name is Harsh",
@@ -20,7 +20,7 @@ curl -X POST http://ordox.vercel.app/api/json \\
   const pythonCode = `
 import requests
 
-url = 'http://ordox.vercel.app/api/json'
+url = 'https://ordox.vercel.app/api/json'
 
 data = {
     'data': 'My name is Harsh',
@@ -42,7 +42,7 @@ else:
   `;
 
   const jsCode = `
-const url = 'http://ordox.vercel.app/api/json';
+const url = 'https://ordox.vercel.app/api/json';
 
 const data = {
   data: 'My name is Harsh',
@@ -68,7 +68,7 @@ require 'net/http'
 require 'json'
 require 'uri'
 
-url = URI.parse('http://ordox.vercel.app/api/json')
+url = URI.parse('https://ordox.vercel.app/api/json')
 http = Net::HTTP.new(url.host, url.port)
 
 request = Net::HTTP::Post.new(url.request_uri)
@@ -97,7 +97,7 @@ import java.net.URL;
 public class Main {
     public static void main(String[] args) {
         try {
-            URL url = new URL("http://ordox.vercel.app/api/json");
+            URL url = new URL("https://ordox.vercel.app/api/json");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Type", "application/json");
@@ -124,7 +124,7 @@ public class Main {
   const phpCode = `
 <?php
 
-$url = 'http://ordox.vercel.app/api/json';
+$url = 'https://ordox.vercel.app/api/json';
 $data = [
     'data' => 'My name is Harsh',
     'format' => [
