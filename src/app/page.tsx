@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { CopyButton } from '@/components/ui/copy';
+import Link from 'next/link';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 
 export default function Home() {
@@ -154,9 +155,15 @@ curl_close($ch);
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-24">
-      <Button variant="outline" className="rounded-full mb-7 text-sm p-5 text-zinc-400">
+  <Button variant="outline" className="rounded-full mb-7 text-sm p-5 text-zinc-400">
+    <Link href="https://github.com/harshsbhat/ordox" passHref
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-zinc-400 hover:text-zinc-300"
+      >
         Star OrdoX on&nbsp;<span className="text-zinc-200">Github ⭐</span>
-      </Button>
+    </Link>
+  </Button>
       <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-6xl bg-gradient-to-b from-zinc-200 to-zinc-400 text-transparent bg-clip-text text-center">
         Convert any data to JSON
       </h1>
