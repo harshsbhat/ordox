@@ -2,7 +2,8 @@ import { openai } from "@/lib/openai";
 import { NextRequest, NextResponse } from "next/server";
 import { ZodTypeAny, z } from "zod";
 import { EXAMPLE_ANSWER, EXAMPLE_PROMPT } from "./example";
-import { isRateLimited } from "@/lib/ratelimit"; // Import the rate limiting function
+import { isRateLimited } from "@/lib/ratelimit"; 
+import redis from "@/lib/redis";
 
 const determineSchemaType = (schema: any): string => {
   if (!schema.hasOwnProperty("type")) {
@@ -60,7 +61,11 @@ class RetryablePromise<T> extends Promise<T> {
 }
 
 export const POST = async (req: NextRequest) => {
-  const ip = req.headers.get('x-forwarded-for') || 'unknown-ip'; // Get IP address from headers
+
+  let count = await redis.get('count');
+  redis.incr('count')
+  console.log(count)
+  const ip = req.headers.get('x-forwarded-for') || 'unknown-ip';
   if (isRateLimited(ip)) {
     return NextResponse.json({ error: 'Too many requests, please try again later.' }, { status: 429 });
   }
