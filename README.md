@@ -70,7 +70,7 @@ Check it out [here](https://ordox.vercel.app/)
 
 You can use `https://ordox.vercel.app/api/json` to convert your Unstructured data into JSON using OpenAI gpt-4 model. Although it has a limit of 2 requests per 30 seconds
 
-You can use `http://localhost:3000/api/jsonCheap` to convert your Unstructured data into JSON using OpenAI gpt-3.5-turbo model. This one has a limit of 4 requests per 30 seconds
+You can use `https://ordox.vercel.app/api/json` to convert your Unstructured data into JSON using OpenAI gpt-3.5-turbo model. This one has a limit of 4 requests per 30 seconds
 
 
 ## License
