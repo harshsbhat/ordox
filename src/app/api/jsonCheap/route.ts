@@ -1,10 +1,9 @@
-import { unkey } from "@/lib/unkey"; // Make sure to import Ratelimit
 import { openai } from "@/lib/openai";
 import { NextRequest, NextResponse } from "next/server";
 import { ZodTypeAny, z } from "zod";
 import { EXAMPLE_ANSWER, EXAMPLE_PROMPT } from "../../../lib/example";
+import { unkey } from "@/lib/unkey"
 import redis from "@/lib/redis";
-
 
 const determineSchemaType = (schema: any): string => {
   if (!schema.hasOwnProperty("type")) {
@@ -62,19 +61,19 @@ class RetryablePromise<T> extends Promise<T> {
 }
 
 const getClientIp = (req: NextRequest): string => {
-  const ip = req.headers.get("x-forwarded-for") ?? "anonymous";
-  if (ip.startsWith("::ffff:")) {
-    return ip.slice(7); 
-  }
-  return ip;
-};
+    const ip = req.headers.get("x-forwarded-for") ?? "anonymous";
+    if (ip.startsWith("::ffff:")) {
+      return ip.slice(7); 
+    }
+    return ip;
+  };
 
 export const POST = async (req: NextRequest) => {
-  // Get the client's IP address
+
   const ip = getClientIp(req);
 
   // Check the rate limit
-  const rateLimitResponse = await unkey.limit(ip, { cost: 4 });
+  const rateLimitResponse = await unkey.limit(ip, { cost: 2 });
 
   // If the rate limit is exceeded, respond with an error
   if (!rateLimitResponse.success) {
@@ -85,9 +84,10 @@ export const POST = async (req: NextRequest) => {
   }
 
 
+  // Increment the request count in Redis
   let count = await redis.get('count');
   redis.incr('count');
-
+  
   const body = await req.json();
   const genericSchema = z.object({
     data: z.string(),
@@ -108,7 +108,7 @@ export const POST = async (req: NextRequest) => {
     async (resolve, reject) => {
       try {
         const res = await openai.chat.completions.create({
-          model: "gpt-4o",
+          model: "gpt-3.5-turbo",
           messages: [
             {
               role: "assistant",
