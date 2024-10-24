@@ -22,7 +22,7 @@ Check it out [here](https://ordox.vercel.app/)
 
 [OpenAI API](https://platform.openai.com/docs/overview)
 
-[Upstash Redis](https://console.upstash.com/) (**Optional** as we just keep track of total requests using this)
+[Upstash Redis](https://console.upstash.com/) (**Optional** as we just keep track of total requests using this. Required if you are planning to deploy this)
 
 
 ## Setup Unkey 
