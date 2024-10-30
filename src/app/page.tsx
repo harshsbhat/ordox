@@ -90,11 +90,24 @@ curl -X POST https://ordox.vercel.app/api/jsonCheap \\
           </div>
         </TabsContent>
       </Tabs>
+      <div className="mt-8 flex flex-col md:flex-row gap-3">
+      <Button className="p-6 rounded-l w-[250px]">
+        <Link href="/auth/login">
+        Get Logs
+        </Link>
+      </Button>
+      <a href="mailto:harsh121102@gmail.com?subject=Enterprise Inquiry&body=Hi, I'm interested in learning more about your enterprise solutions.">
+      <Button className="p-6 rounded-l w-[250px] bg-zinc-900 text-zinc-50 border border-zinc-700 hover:bg-zinc-700">
+        Contact for Enterprise
+      </Button>
+    </a>
+
+    </div>
 
       <div className="flex flex-col md:flex-row justify-center mt-10 space-y-4 md:space-y-0 md:space-x-12">
         <p className="text-zinc-400 font-medium text-lg">✅ Data Extraction</p>
         <p className="text-zinc-400 font-medium text-lg">✅ Web Scraping</p>
-        <p className="text-zinc-400 font-medium text-lg">✅ Email Processing</p>
+        <p className="text-zinc-400 font-medium text-lg">✅ Semantic Caching ( SOON )</p>
       </div>
     </main>
   );
